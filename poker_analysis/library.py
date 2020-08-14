@@ -138,7 +138,8 @@ def read_csv(file):
     reader = csv.reader(file)
     events = []
     afindall = lambda regex_entry: re.findall(admin_regexes[regex_entry], entry)
-    for row in reversed(list(reader)):
+    reader = reversed(list(reader))
+    for row in reader:
         entry, at, order = row
         afind = afindall(Action.CASH_IN)
         if afind:

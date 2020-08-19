@@ -51,12 +51,12 @@ def get_vpip(data):
                         active_players.remove(player)
     return vpip
 
-bet_potential = {library.Action.BET, library.Action.RAISE}
+bet_potential = {library.Action.CALL, library.Action.BET, library.Action.RAISE}
 def get_betsize(data):
-    sizes = {}
+    sizes, hand = {}, {}
     players = get_players(data)
     for player in players:
-        sizes[player] = {'count':0, 'total':0}
+        sizes[player], hand[player] = {'count':0, 'total':0}, {'previous': 0}
     for event in data:
         if type(event) is dict:
             active_players = set(event['stacks'].keys())
@@ -65,11 +65,22 @@ def get_betsize(data):
                     break
                 player = line[0]
                 action = line[1]
-                if player in active_players:
-                    if action in bet_potential:
-                        sizes[player]['count'] += (-1 * line[2])
-                        sizes[player]['total'] += 1
+                if action not in bet_potential:
+                    if player in active_players:
+                        hand[player]['previous'] = (-1 * line[2])
                         active_players.remove(player)
+                else:
+                    pot = 0
+                    for player in players:
+                        if (hand[player]['previous'] == 0):
+                            continue
+                        pot +=  hand[player]['previous']
+                    for player in players:
+                        if (hand[player]['previous'] == 0):
+                            continue
+                        sizes[player]['count'] += hand[player]['previous'] / pot
+                        sizes[player]['total'] += 1
+                        hand[player]['previous'] = 0
     return sizes
 
 # # Analysis
@@ -101,5 +112,5 @@ def get_statistics(data):
     sizes = get_betsize(data)
     output = []
     for player in vpips:
-        output.append(player+": "+'{:.1%}'.format(vpips[player]['count']/vpips[player]['total']) + f" over {vpips[player]['total']} hands. Average bet size is " + str(sizes[player]['count'] / sizes[player]['total']))
+        output.append(player+": "+'{:.1%}'.format(vpips[player]['count']/vpips[player]['total']) + f" over {vpips[player]['total']} hands. Average bet size is " + '{:.1%}'.format(sizes[player]['count'] / sizes[player]['total']))
     return "<br>".join(output)

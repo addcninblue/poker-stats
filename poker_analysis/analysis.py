@@ -51,6 +51,7 @@ def get_vpip(data):
                         active_players.remove(player)
     return vpip
 
+bet_potential = {library.Action.BET, library.Action.RAISE}
 def get_betsize(data):
     sizes = {}
     players = get_players(data)
@@ -65,7 +66,7 @@ def get_betsize(data):
                 player = line[0]
                 action = line[1]
                 if player in active_players:
-                    if action in yes_vpip:
+                    if action in bet_potential:
                         sizes[player]['count'] += (-1 * line[2])
                         sizes[player]['total'] += 1
                         active_players.remove(player)

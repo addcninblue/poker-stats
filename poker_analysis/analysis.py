@@ -51,6 +51,26 @@ def get_vpip(data):
                         active_players.remove(player)
     return vpip
 
+def get_betsize(data):
+    sizes = {}
+    players = get_players(data)
+    for player in players:
+        sizes[player] = {'count':0, 'total':0}
+    for event in data:
+        if type(event) is dict:
+            active_players = set(event['stacks'].keys())
+            for line in event['lines']:
+                if len(active_players) == 0:
+                    break
+                player = line[0]
+                action = line[1]
+                if player in active_players:
+                    if action in yes_vpip:
+                        sizes[player]['count'] += (-1 * line[2])
+                        sizes[player]['total'] += 1
+                        active_players.remove(player)
+    return sizes
+
 # # Analysis
 # datas = [data1, data2, data3]
 # players = []
@@ -77,7 +97,8 @@ def plot_stack_counts(data):
 
 def get_statistics(data):
     vpips = get_vpip(data)
+    sizes = get_betsize(data)
     output = []
     for player in vpips:
-        output.append(player+": "+'{:.1%}'.format(vpips[player]['count']/vpips[player]['total']) + f" over {vpips[player]['total']} hands")
+        output.append(player+": "+'{:.1%}'.format(vpips[player]['count']/vpips[player]['total']) + f" over {vpips[player]['total']} hands. Average bet size is " + str(sizes[player]['count'] / sizes[player]['total']))
     return "<br>".join(output)

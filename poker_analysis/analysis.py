@@ -112,5 +112,6 @@ def get_statistics(data):
     sizes = get_betsize(data)
     output = []
     for player in vpips:
-        output.append(player+": "+'{:.1%}'.format(vpips[player]['count']/vpips[player]['total']) + f" over {vpips[player]['total']} hands. Average bet size is " + '{:.1%}'.format(sizes[player]['count'] / sizes[player]['total']))
+        #output.append(player+": "+'{:.1%}'.format(vpips[player]['count']/vpips[player]['total']) + f" over {vpips[player]['total']} hands. Average bet size is " + '{:.1%}'.format(sizes[player]['count'] / sizes[player]['total']))
+        output.append(player+": "+'{:.1%}'.format(vpips[player]['count']/vpips[player]['total']) + f" over {vpips[player]['total']} hands.")
     return "<br>".join(output)
